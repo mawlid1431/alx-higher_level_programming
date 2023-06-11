@@ -1,88 +1,77 @@
-#include <stdio.h>
-#include <stdlib.h>
+/*
+ * File: 13-is_palindrome.c
+ * Auth: Mbah Nkemdinma
+ */
 
-/* Structure for a singly-linked list node */
-typedef struct Node {
-    int data;
-    struct Node* next;
-} Node;
+#include "lists.h"
 
-/* Function to check if a linked list is a palindrome */
-int isPalindrome(Node* head) {
-    Node* slow = head;
-    Node* fast = head;
-    Node* prev = NULL;
-    Node* temp = NULL;
+listint_t *reverse_listint(listint_t **head);
+int is_palindrome(listint_t **head);
 
-    /* Find the middle of the list and reverse the first half */
-    while (fast && fast->next) {
-        fast = fast->next->next;
+/**
+ * reverse_listint - Reverses a singly-linked listint_t list.
+ * @head: A pointer to the starting node of the list to reverse.
+ *
+ * Return: A pointer to the head of the reversed list.
+ */
+listint_t *reverse_listint(listint_t **head)
+{
+	listint_t *node = *head, *next, *prev = NULL;
 
-        /* Reverse the first half of the list */
-        temp = slow->next;
-        slow->next = prev;
-        prev = slow;
-        slow = temp;
-    }
+	while (node)
+	{
+		next = node->next;
+		node->next = prev;
+		prev = node;
+		node = next;
+	}
 
-    /* Handle odd length lists */
-    if (fast)
-        slow = slow->next;
-
-    /* Compare the reversed first half with the second half */
-    while (slow) {
-        if (slow->data != prev->data)
-            return 0;
-        slow = slow->next;
-        prev = prev->next;
-    }
-
-    return 1; /* The list is a palindrome */
+	*head = prev;
+	return (*head);
 }
 
-/* Function to create a new linked list node */
-Node* newNode(int data) {
-    Node* node = (Node*)malloc(sizeof(Node));
-    node->data = data;
-    node->next = NULL;
-    return node;
-}
+/**
+ * is_palindrome - Checks if a singly linked list is a palindrome.
+ * @head: A pointer to the head of the linked list.
+ *
+ * Return: If the linked list is not a palindrome - 0.
+ *         If the linked list is a palindrome - 1.
+ */
+int is_palindrome(listint_t **head)
+{
+	listint_t *tmp, *rev, *mid;
+	size_t size = 0, i;
 
-/* Function to free the memory allocated for the linked list */
-void freeList(Node* head) {
-    Node* temp;
-    while (head) {
-        temp = head;
-        head = head->next;
-        free(temp);
-    }
-}
+	if (*head == NULL || (*head)->next == NULL)
+		return (1);
 
-/* Test case */
-int main() {
-    /* Create a sample linked list */
-    Node* head = newNode(1);
-    head->next = newNode(17);
-    head->next->next = newNode(972);
-    head->next->next->next = newNode(50);
-    head->next->next->next->next = newNode(98);
-    head->next->next->next->next->next = newNode(98);
-    head->next->next->next->next->next->next = newNode(50);
-    head->next->next->next->next->next->next->next = newNode(972);
-    head->next->next->next->next->next->next->next->next = newNode(17);
-    head->next->next->next->next->next->next->next->next->next = newNode(1);
+	tmp = *head;
+	while (tmp)
+	{
+		size++;
+		tmp = tmp->next;
+	}
 
-    /* Check if the linked list is a palindrome */
-    int result = isPalindrome(head);
+	tmp = *head;
+	for (i = 0; i < (size / 2) - 1; i++)
+		tmp = tmp->next;
 
-    /* Print the result */
-    if (result)
-        printf("Linked list is a palindrome\n");
-    else
-        printf("Linked list is not a palindrome\n");
+	if ((size % 2) == 0 && tmp->n != tmp->next->n)
+		return (0);
 
-    /* Free the memory */
-    freeList(head);
+	tmp = tmp->next->next;
+	rev = reverse_listint(&tmp);
+	mid = rev;
 
-    return 0;
+	tmp = *head;
+	while (rev)
+	{
+		if (tmp->n != rev->n)
+			return (0);
+		tmp = tmp->next;
+		rev = rev->next;
+	}
+	reverse_listint(&mid);
+
+	return (1);
 }
