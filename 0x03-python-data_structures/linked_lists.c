@@ -1,74 +1,71 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "lists.h"
 
-/**
- * print_listint - prints all elements of a listint_t list
- * @h: pointer to head of list
- * Return: number of nodes
- */
-size_t print_listint(const listint_t *h)
-{
-    const listint_t *current;
-    unsigned int n; /* number of nodes */
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
 
-    current = h;
-    n = 0;
-    while (current != NULL)
-    {
-        printf("%i\n", current->n);
-        current = current->next;
-        n++;
+int isPalindrome(Node* head) {
+    Node* slow = head;
+    Node* fast = head;
+    Node* prev = NULL;
+
+    /* Traverse the list and reverse the first half */
+    while (fast && fast->next) {
+        fast = fast->next->next;
+        Node* temp = slow->next;
+        slow->next = prev;
+        prev = slow;
+        slow = temp;
     }
 
-    return (n);
-}
+    /* If the list has an odd number of elements, move slow pointer one step forward */
+    if (fast)
+        slow = slow->next;
 
-/**
- * add_nodeint_end - adds a new node at the end of a listint_t list
- * @head: pointer to pointer of first node of listint_t list
- * @n: integer to be included in new node
- * Return: address of the new element or NULL if it fails
- */
-listint_t *add_nodeint_end(listint_t **head, const int n)
-{
-    listint_t *new;
-    listint_t *current;
-
-    current = *head;
-
-    new = malloc(sizeof(listint_t));
-    if (new == NULL)
-        return (NULL);
-
-    new->n = n;
-    new->next = NULL;
-
-    if (*head == NULL)
-        *head = new;
-    else
-    {
-        while (current->next != NULL)
-            current = current->next;
-        current->next = new;
+    /* Compare the reversed first half with the second half */
+    while (prev) {
+        if (prev->data != slow->data)
+            return 0;
+        prev = prev->next;
+        slow = slow->next;
     }
 
-    return (new);
+    return 1; /* The list is a palindrome */
 }
 
-/**
- * free_listint - frees a listint_t list
- * @head: pointer to list to be freed
- * Return: void
- */
-void free_listint(listint_t *head)
-{
-    listint_t *current;
+Node* newNode(int data) {
+    Node* node = (Node*)malloc(sizeof(Node));
+    node->data = data;
+    node->next = NULL;
+    return node;
+}
 
-    while (head != NULL)
-    {
-        current = head;
+void freeList(Node* head) {
+    Node* temp;
+    while (head) {
+        temp = head;
         head = head->next;
-        free(current);
+        free(temp);
     }
+}
+
+int main() {
+    Node* head = newNode(1);
+    head->next = newNode(2);
+    head->next->next = newNode(3);
+    head->next->next->next = newNode(2);
+    head->next->next->next->next = newNode(1);
+
+    int result = isPalindrome(head);
+
+    if (result)
+        printf("Linked list is a palindrome\n");
+    else
+        printf("Linked list is not a palindrome\n");
+
+    freeList(head);
+
+    return 0;
 }
