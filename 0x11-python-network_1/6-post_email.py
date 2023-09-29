@@ -21,3 +21,9 @@ if __name__ == "__main__":
     print(f"Your email is: {email}")
     print(response.text)
 
+<<<<<<< HEAD
+=======
+    request = urllib.request.Request(url)
+    with urllib.request.urlopen(request) as response:
+        print(dict(response.headers).get("X-Request-Id"))
+>>>>>>> 43670704c4260c5e3d7ca0f0a713862fe0bfa462
